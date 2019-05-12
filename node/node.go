@@ -1,6 +1,8 @@
 package node
 
 import (
+	"time"
+
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
 )
@@ -12,11 +14,16 @@ type Node interface {
 	IsDir() bool
 }
 
+// FetchFileFunc is the type for provide how file is dowloaded
+type FetchFileFunc func(f *FileNode) error
+
 // FileNode is the expression of files
 type FileNode struct {
 	nodefs.Node
-	Path string
-	Name string
+	Path      string
+	Name      string
+	FetchFile FetchFileFunc
+	File      File
 }
 
 // GetName returns the name of the file
@@ -27,6 +34,38 @@ func (file *FileNode) GetName() string {
 // IsDir returns false
 func (file *FileNode) IsDir() bool {
 	return false
+}
+
+// File is file
+type File struct {
+	nodefs.File
+
+	Content []byte
+	Size    uint64
+}
+
+// Read reads from file
+func (f *File) Read(dest []byte, off int64) (fuse.ReadResult, fuse.Status) {
+	return fuse.ReadResultData(f.Content), fuse.OK
+}
+
+// Open returns file
+func (file *FileNode) Open(flags uint32, ctx *fuse.Context) (nodefs.File, fuse.Status) {
+	err := file.FetchFile(file)
+	if err != nil {
+		return nil, fuse.ToStatus(err)
+	}
+	return nodefs.NewDataFile(file.File.Content), fuse.OK
+}
+
+// GetAttr get attr
+func (file *FileNode) GetAttr(out *fuse.Attr, f nodefs.File, ctx *fuse.Context) fuse.Status {
+	out.Size = file.File.Size
+	out.Mode = fuse.S_IFREG | 0444
+	out.Ctime = uint64(time.Now().Unix())
+	out.Mtime = uint64(time.Now().Unix())
+
+	return fuse.OK
 }
 
 // DirNode is the expression of directories
@@ -62,11 +101,13 @@ func (dir *DirNode) OpenDir(ctx *fuse.Context) ([]fuse.DirEntry, fuse.Status) {
 }
 
 // NewFileNode returns new file node
-func NewFileNode(path string, name string) *FileNode {
+func NewFileNode(path string, name string, f FetchFileFunc) *FileNode {
 	return &FileNode{
-		Node: nodefs.NewDefaultNode(),
-		Path: path,
-		Name: name,
+		Node:      nodefs.NewDefaultNode(),
+		Path:      path,
+		Name:      name,
+		FetchFile: f,
+		File:      File{File: nodefs.NewDefaultFile(), Size: 0},
 	}
 }
 

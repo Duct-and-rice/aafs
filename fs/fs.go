@@ -1,8 +1,6 @@
 package fs
 
 import (
-	"fmt"
-
 	"github.com/Duct-and-rice/aafs/provider"
 	"github.com/hanwen/go-fuse/fuse"
 	"github.com/hanwen/go-fuse/fuse/nodefs"
@@ -35,7 +33,6 @@ func (root *Root) OpenDir(ctx *fuse.Context) ([]fuse.DirEntry, fuse.Status) {
 			Mode: 444,
 			Name: name,
 		}
-		fmt.Printf("%#v\n", child)
 		if p.GetChild(name) == nil {
 			p.NewChild(name, child.IsDir(), child)
 		}
