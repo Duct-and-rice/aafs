@@ -109,6 +109,8 @@ func fetchFile(file *node.FileNode) error {
 		file.File.Content = memo[file.Path]
 		return nil
 	}
+
+	fmt.Printf("start fetch MLT: %s\n", file.GetName())
 	url := "https://aa-storage.aahub.org/folders/" + file.Path + ".json"
 	resp, err := http.Get(url)
 	if err != nil {
@@ -147,9 +149,11 @@ func fetchFile(file *node.FileNode) error {
 	file.File.Size = uint64(len(memo[file.Path]))
 
 	if len(memo) > 128 {
+		fmt.Printf("flush memo\n")
 		for i := range memo {
 			memo[i] = nil
 		}
 	}
+	fmt.Printf("end fetch MLT\n")
 	return nil
 }
