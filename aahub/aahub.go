@@ -133,7 +133,7 @@ func fetchFile(file *node.FileNode) error {
 	for i, aa := range data.AAs {
 		b.WriteString(aa.Value)
 		if i < len(data.AAs)-1 {
-			b.WriteString("\n[SPLIT]\n")
+			b.WriteString("[SPLIT]\n")
 		}
 	}
 	result, err := encoder.String(strings.Replace(b.String(), "\n", "\r\n", -1))
