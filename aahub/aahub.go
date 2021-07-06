@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -43,7 +44,7 @@ func (provider *Provider) Name() string {
 
 // FetchFiles get directory from aahub
 func (provider *Provider) FetchFiles() error {
-	fmt.Printf("start fetch directories\n")
+	log.Printf("start fetch directories\n")
 	url := "https://aa-storage.aahub.org/folders.json"
 	resp, err := http.Get(url)
 	if err != nil {
@@ -62,7 +63,7 @@ func (provider *Provider) FetchFiles() error {
 	}
 
 	provider.Folders = data.Folders
-	fmt.Printf("end fetch directories\n")
+	log.Printf("end fetch directories\n")
 	return nil
 }
 

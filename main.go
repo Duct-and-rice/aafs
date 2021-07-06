@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/Duct-and-rice/aafs/fs"
-	nodefs "github.com/hanwen/go-fuse/fuse/nodefs"
+	nodefs "github.com/hanwen/go-fuse/v2/fuse/nodefs"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -23,9 +23,12 @@ func main() {
 
 	opts := nodefs.Options{}
 	opts.Debug = *debug
+	log.Printf("%s\n", *mountpoint)
 	s, _, err := nodefs.MountRoot(*mountpoint, root, &opts)
 	if err != nil {
 		log.Fatal("Mount Error:", err)
+	} else {
+		log.Printf("%s\n", *mountpoint)
 	}
 	s.Serve()
 }

@@ -2,8 +2,8 @@ package fs
 
 import (
 	"github.com/Duct-and-rice/aafs/provider"
-	"github.com/hanwen/go-fuse/fuse"
-	"github.com/hanwen/go-fuse/fuse/nodefs"
+	"github.com/hanwen/go-fuse/v2/fuse"
+	"github.com/hanwen/go-fuse/v2/fuse/nodefs"
 )
 
 // Root is the expression of the root directory
